@@ -27,8 +27,8 @@ void VertexShader1(in float4 inPosition : POSITION,
     
     // 揺らしエフェクトを適用
     // Y座標の高さに基づいて揺らしの強度を変える（上にいくほど大きく揺れる）
-    float heightFactor = (pos.y + 2.5) / 5.0; // 円柱の高さに合わせて調整
-    heightFactor = pow(heightFactor, 4.0);
+    float heightFactor = (pos.y + 0.5) / 5.0; // 円柱の高さに合わせて調整
+    heightFactor = pow(heightFactor, 3.0);
     heightFactor = clamp(heightFactor, 0.0, 1.0);
     
     // 複数の波を組み合わせて自然な揺らしを作成

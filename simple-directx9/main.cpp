@@ -294,11 +294,11 @@ void Render()
     assert(hResult == S_OK);
 
     // 揺らしの強度を設定
-    hResult = g_pEffect->SetFloat("g_swayAmount", 0.5f);
+    hResult = g_pEffect->SetFloat("g_swayAmount", 5.5f);
     assert(hResult == S_OK);
 
     // 揺らしの速度を設定
-    hResult = g_pEffect->SetFloat("g_swaySpeed", 5.0f);
+    hResult = g_pEffect->SetFloat("g_swaySpeed", 15.0f);
     assert(hResult == S_OK);
 
     hResult = g_pd3dDevice->Clear(0,
