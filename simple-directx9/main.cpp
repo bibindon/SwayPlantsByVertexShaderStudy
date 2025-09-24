@@ -72,7 +72,7 @@ int WINAPI _tWinMain(_In_ HINSTANCE hInstance,
     rect.left = 0;
 
     HWND hWnd = CreateWindow(_T("Window1"),
-                             _T("Hello DirectX9 World !!"),
+                             _T("Swaying Cylinder Effect"),
                              WS_OVERLAPPEDWINDOW,
                              CW_USEDEFAULT,
                              CW_USEDEFAULT,
@@ -117,8 +117,6 @@ void TextDraw(LPD3DXFONT pFont, TCHAR* text, int X, int Y)
 {
     RECT rect = { X, Y, 0, 0 };
 
-    // DrawTextの戻り値は文字数である。
-    // そのため、hResultの中身が整数でもエラーが起きているわけではない。
     HRESULT hResult = pFont->DrawText(NULL,
                                       text,
                                       -1,
@@ -187,7 +185,7 @@ void InitD3D(HWND hWnd)
 
     LPD3DXBUFFER pD3DXMtrlBuffer = NULL;
 
-    hResult = D3DXLoadMeshFromX(_T("cube.x"),
+    hResult = D3DXLoadMeshFromX(_T("cylinder.blend.x"),
                                 D3DXMESH_SYSTEMMEM,
                                 g_pd3dDevice,
                                 NULL,
@@ -207,14 +205,6 @@ void InitD3D(HWND hWnd)
         g_pMaterials[i] = d3dxMaterials[i].MatD3D;
         g_pMaterials[i].Ambient = g_pMaterials[i].Diffuse;
         g_pTextures[i] = NULL;
-        
-        //--------------------------------------------------------------
-        // Unicode文字セットでもマルチバイト文字セットでも
-        // "d3dxMaterials[i].pTextureFilename"はマルチバイト文字セットになる。
-        // 
-        // 一方で、D3DXCreateTextureFromFileはプロジェクト設定で
-        // Unicode文字セットかマルチバイト文字セットか変わる。
-        //--------------------------------------------------------------
 
         std::string pTexPath(d3dxMaterials[i].pTextureFilename);
 
@@ -288,14 +278,27 @@ void Render()
                                1.0f,
                                10000.0f);
 
-    D3DXVECTOR3 vec1(10 * sinf(f), 10, -10 * cosf(f));
+    D3DXVECTOR3 vec1(10, 10, -10);
     D3DXVECTOR3 vec2(0, 0, 0);
     D3DXVECTOR3 vec3(0, 1, 0);
     D3DXMatrixLookAtLH(&View, &vec1, &vec2, &vec3);
     D3DXMatrixIdentity(&mat);
     mat = mat * View * Proj;
 
+    // シェーダーパラメータを設定
     hResult = g_pEffect->SetMatrix("g_matWorldViewProj", &mat);
+    assert(hResult == S_OK);
+
+    // 時間パラメータを設定（揺らし効果用）
+    hResult = g_pEffect->SetFloat("g_time", f);
+    assert(hResult == S_OK);
+
+    // 揺らしの強度を設定
+    hResult = g_pEffect->SetFloat("g_swayAmount", 0.5f);
+    assert(hResult == S_OK);
+
+    // 揺らしの速度を設定
+    hResult = g_pEffect->SetFloat("g_swaySpeed", 5.0f);
     assert(hResult == S_OK);
 
     hResult = g_pd3dDevice->Clear(0,
@@ -311,7 +314,7 @@ void Render()
     assert(hResult == S_OK);
 
     TCHAR msg[100];
-    _tcscpy_s(msg, 100, _T("Xファイルの読み込みと表示"));
+    _tcscpy_s(msg, 100, _T("揺れる円柱エフェクト"));
     TextDraw(g_pFont, msg, 0, 0);
 
     hResult = g_pEffect->SetTechnique("Technique1");
@@ -363,4 +366,3 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
-
